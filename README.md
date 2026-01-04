@@ -1,0 +1,2 @@
+# komutanjumpcutter
+deneme
