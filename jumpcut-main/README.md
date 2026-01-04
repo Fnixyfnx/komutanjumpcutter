@@ -1,71 +1,62 @@
-# OpenJumpCuts
-A free, open-source jump cut extension for Adobe Premiere Pro.
+# OpenJumpCuts  
+Adobe Premiere Pro için ücretsiz, açık kaynaklı bir jump cut eklentisi.
 
-![](img/demo.gif)
+Şu anda **alfa** aşamasında. Hatalar beklenmelidir. Çalışmalarınızın yedeğini alın.
 
-Currently in **alpha**. Expect bugs. Make copies of your work.
+## Hakkında
+Bu eklentiyi, Adobe Premiere’de uzun ve tekrarlı eğitim içerikleri düzenleme deneyimime dayanarak yaptım. “Jump cut”, podcast’ler, röportajlar vb. içeriklerdeki sessizlikleri ve hataları kırpma işlemine verilen isimdir. Var olan birkaç jump cut eklentisi olsa da, bunların hiçbiri ücretsiz ve açık kaynaklı değildir.
 
-## About
-I made this extension based on my experience editing lengthy, repetitive educational materials in Adobe Premiere. 'Jump cut' refers to the tedious task of removing silence and mistakes from podcasts, interviews, etc. While there are several extensions for jump cuts that exist already, none of them are free and open-source.
+Eklenti, verilen bir klibin ses dalga formunu analiz ederek belirli bir ses yüksekliği eşiğinin altındaki bölgeleri kaldırarak çalışır. Ses yüksekliği eşiği (cutoff), dolgu (padding) ve minimum sessizlik süresi gibi değerlerin tümü Premiere içindeki eklenti arayüzünden yapılandırılabilir.
 
-The extension works by analyzing the audio waveform of a given clip and removing areas below a certain loudness threshold. The loudness threshold, padding, and minimum silence lengths are all configurable from the extension GUI in Premiere.
+### CEP ve UXP
+Adobe, CEP eklentilerini aşamalı olarak bırakıp UXP eklentilerine geçiş üzerinde çalışıyor. Bu bir CEP eklentisidir ve bu nedenle sonunda UXP’ye taşınması gerekecektir. Aralık 2023 itibarıyla Premiere henüz UXP’yi desteklememektedir.
 
-### CEP and UXP
-Adobe is working on phasing out CEP extensions in favor of UXP extensions. This is a CEP plugin, and so will eventually need to be ported to UXP. As of December, 2023,  Premiere does not yet support UXP.
+### Premiere AI araçları hakkında not
+Kasım 2023 itibarıyla Premiere’in AI araçları hâlâ beta aşamasındadır. Dalga formu tabanlı jump cut otomasyonuna potansiyel bir alternatif olarak umut verici olsalar da, kendi iş akışımda kullanabileceğim seviyede değiller.
 
-### A note on Premiere AI tools
-As of November of 2023, the Premiere AI tools are still in beta. They are promising as a potential replacement for waveform-based jump cut automation, but they are still not at the point where I find them usable in my own workflow.
+## Kurulum
+Eklenti şu anda Adobe’nin dağıtım platformlarında yer almamaktadır, bu nedenle elle kurulmalıdır.
 
-## Installation
-The extension is not currently available on Adobe's distribution platforms, so it must be installed manually.
+Depoyu, Adobe CEP eklentileri klasörünüze klonlayın.  
+Windows’ta: `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions`
 
-Clone the repository into your Adobe CEP extensions folder. \
-On Windows: `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions`\
+Premiere API, ses dalga formuna dair verileri sunmadığından, eklenti jump cut hesaplamalarını gerçekleştirmek için harici bir çalıştırılabilir dosyaya ( `jumpcut.py` dosyasının `pyinstaller` ile derlenmiş hali) dayanır. Bu çalıştırılabilir dosya, farklı kodekleri okuyabilmek için [ffmpeg](https://ffmpeg.org/download.html)’e dayanır. `ffmpeg` sistem PATH’inizden erişilebilir olmalıdır.
 
-The Premiere API does not expose data on audio waveforms, so
-the extension relies on an external executable (compiled from `jumpcut.py` via `pyinstaller`) to perform jumpcut calculations. This executable in turn relies on [ffmpeg](https://ffmpeg.org/download.html) to read different codecs. `ffmpeg` must be accessible on your system's PATH.
+`ffmpeg` ile ilgili sorunlar nedeniyle şu anda MacOS desteklenmemektedir.
 
-Due to issues with `ffmpeg`, MacOS is currently unsupported.
+Ayrıca, bu çalıştırılabilir dosyanın Premiere’de referans alınan orijinal medya kaynak dosyalarını okuyabilme iznine sahip olması gerektiği de unutulmamalıdır.
 
-It is also worth noting that this executable must have permission to read the original media source files that are referenced in Premiere.
+Eklenti henüz imzalı olmadığı için [debug mode](https://github.com/Adobe-CEP/Samples/tree/master/PProPanel) modunda çalıştırılmalıdır. Ayrıntılar için bölüm 2: “Loading of Unsigned Panels” kısmına bakın.
 
-Since the extension is not currently signed, it must be run in [debug mode](https://github.com/Adobe-CEP/Samples/tree/master/PProPanel). See section 2: "Loading of Unsigned Panels".
+## Kılavuz
 
-## Manual
-#### Prerequisites
-Currently, there are strict limitations on the configuration of clips and timelines that will work. 
+#### Önkoşullar
+Şu anda çalışabilecek klip ve zaman çizelgesi yapılandırmaları için katı sınırlamalar bulunmaktadır.
 
-![](img/timeline.png)
+Yalnızca o anda aktif olan sekans analiz edilir. Zaman çizelgesindeki iç içe (nested) sekanslar desteklenmez. Yalnızca Video 1 ve Audio 1 izlerindeki klipler analiz edilir. Video ve ses klipleri bağlantılı (linked) olmalıdır. Kliplerin zaman çizelgesindeki konumu ve kırpılması önemli değildir.
 
-Only the currently active sequence is analyzed. 
-Nested sequences on the timeline are not supported. Only clips in tracks Video 1 and Audio 1 are analyzed. Video and audio clips must be linked. Position and cropping of the clip in the timeline does not matter.  
+Tanımsız davranışlardan kaçınmak için, zaman çizelgesinde tek bir bağlantılı video/ses klip çifti yoksa eklenti şu anda çalışmaz. Zaman çizelgesinin yalnızca bir bölümünü jump cut yapmak istiyorsanız veya zaten kalabalık bir zaman çizelgesindeki içeriği jump cut etmek istiyorsanız, mevcut iş akışı; klipleri tek tek iç içe sekanslar (nested sequences) olarak kaydetmek ve jump cut işlemini bu iç içe sekanslar içinde çalıştırmaktır.
 
-To avoid undefined behavior, the extension currently will not run unless there is a single linked pair of video/audio clips on the timeline. If you need to jump cut only a portion of a timeline, or wish to jump cut content in an already crowded timeline, the current workflow is to save clips one at a time as nested sequences, and run jump cuts from within those nested sequences.
+Gelecekteki geliştirme hedefleri, bu kısıtlamalar konusunda daha fazla esneklik sağlamayı ve birden fazla klip ile birden fazla iz için mantık eklemeyi içermektedir.
 
-Future development goals include more flexibility regarding these constraints, including logic for handling multiple clips and multiple tracks.
+#### Seçenekler
+Şu anda desteklenen dört jump cut parametresi vardır.
 
-#### Options
-![](img/openjumpcut_ui.png)
+**Cutoff (Eşik):**  
+Bir klibin sessiz kabul edilmesinin altında kalan değerdir. Dönüşümle ilgili zorluklar nedeniyle, şimdilik Premiere’de gösterilen gerçek dB değerlerini tam olarak yansıtmayabilir.
 
-There are four jump cut parameters currently supported.
+**Minimum Silence Length (Minimum Sessizlik Süresi):**  
+Sessiz bir bölüm bu değerden kısaysa yok sayılır.
 
-**Cutoff:**
-This is the value below which a clip is considered silent. Due to difficulties with conversion, for now it likely will not be reflective of the actual dB values shown in Premiere.
+**Minimum Segment Length (Minimum Parça Süresi):**  
+Sessiz olmayan bir bölüm bu değerden kısaysa sessiz kabul edilir.
 
-**Minimum Silence Length:**
-If a silent portion of a clip is shorter than this value, it will be ignored.
+**Padding (Dolgu):**  
+Silinmiş sessiz kısımların etrafına bir miktar sessizlik tamponu ekler.
 
-**Minimum Segment Length:**
-If a non-silent portion of a clip is shorter than this value, it will be considered silent.
+### Bilinen sorunlar
+- Tüm klibiniz siliniyorsa, büyük ihtimalle sessizlik eşiği tüm klibi sessiz kabul edecek kadar yüksek ayarlanmıştır. Eşiği daha düşük bir değere çekmeyi deneyin.
+- Cutoff dB değerleri Premiere’deki dB değerlerini tam olarak yansıtmayabilir.
 
-**Padding:**
-Adds a buffer of silence around areas where sliences have been removed.
-
-### Known issues
-- If your whole clip is being deleted, it is likely that the silence threshold has been set such that the entire clip is considered silent. Try adjusting the threshold slider lower.
-
-- Cutoff dB values may not reflect Premiere dB values.
-
-
-## Bug Reports and Contributing
-If you have a fix or a feature you'd like to add, please open a pull request! Report any bugs in Issues.
+## Hata raporu ve katkı
+Düzeltmek istediğiniz bir hata veya eklemek istediğiniz bir özellik varsa lütfen bir pull request açın. Herhangi bir hatayı Issues bölümünde bildirin.
