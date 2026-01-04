@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Komutan Cutter</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <span class="branding">Komutan Cutter</span>
+        </header>
+
+        <main class="controls">
+            <div class="control-group">
+                <label for="silenceCutoff">Sessizlik Eşiği (dB)</label>
+                <div class="input-group">
+                    <input type="range" id="silenceCutoff" min="-100" max="-1" value="-50">
+                    <input type="number" class="number-input" id="silenceCutoffValue" min="-100" max="-1" value="-50">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="removeOver">Min. Sessizlik Süresi (sn)</label>
+                <div class="input-group">
+                    <input type="range" id="removeOver" min="0.1" max="2" value="0.5" step="0.1">
+                    <input type="number" class="number-input" id="removeOverValue" min="0.1" max="2" value="0.5" step="0.1">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="keepOver">Min. Segment Süresi (sn)</label>
+                <div class="input-group">
+                    <input type="range" id="keepOver" min="0.1" max="2" value="0.5" step="0.1">
+                    <input type="number" class="number-input" id="keepOverValue" min="0.1" max="2" value="0.5" step="0.1">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="padding">Dolgu Süresi (sn)</label>
+                <div class="input-group">
+                    <input type="range" id="padding" min="0.1" max="2" value="0.5" step="0.1">
+                    <input type="number" class="number-input" id="paddingValue" min="0.1" max="2" value="0.5" step="0.1">
+                </div>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="backupCheck" name="backupCheck">
+                <label for="backupCheck">Sekansın yedeğini oluştur</label>
+            </div>
+
+            <button id="jumpcutbutton" onclick="runJumpCut()">Jump Cut Uygula</button>
+        </main>
+    </div>
+    
+    <script type="text/javascript" src="CSInterface.js"></script>
+    <script type="text/javascript" src="index.js"></script>
+</body>
+</html>
